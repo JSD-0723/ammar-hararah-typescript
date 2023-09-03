@@ -1,8 +1,12 @@
 import { appendFile } from 'fs/promises';
 import * as http from 'http';
+import { config } from 'dotenv';
 
-const hostname = '127.0.0.1';
-const port = 3000;
+config();
+
+const hostname = process.env.HOSTNAME;
+const port = process.env.PORT;
+
 
 const server = http.createServer((req, res) => {
     var url = req.url;
@@ -11,7 +15,7 @@ const server = http.createServer((req, res) => {
         const urlString = `Request URL: ${url} - `;
         const timestampString = `Timestamp: ${Date().toString()}\n`;
 
-        console.log("Adding request log..")
+        console.log("Adding request log..");
         appendFile("requests.txt", urlString + timestampString);
         console.log("Request Log Added!");
 
