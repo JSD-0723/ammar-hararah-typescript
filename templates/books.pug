@@ -1,0 +1,11 @@
+html 
+  head
+    title Books List
+  body 
+    for book in books
+        a(href=`/books/${book.id}`) h2 #{book.name}
+        
+        p #{book.shortDescription}
+        p #{book.authors[0]}
+        p Pages: #{book.pageCount}
+        

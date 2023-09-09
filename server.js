@@ -1,33 +1,49 @@
-import { appendFile } from 'fs/promises';
-import * as http from 'http';
-import { config } from 'dotenv';
+require('dotenv').config();
 
-config();
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
 
-const hostname = process.env.HOSTNAME;
+let rawBooks = fs.readFileSync('books.json');
+let booksList = JSON.parse(rawBooks);
+
+
+const app = express();
 const port = process.env.PORT;
 
+app.set("view engine", "pug");
+app.set("views", path.resolve("./templates"));
 
-const server = http.createServer((req, res) => {
-    var url = req.url;
+app.listen(port, () => {
+    console.log("Express app is listening on the port 3000!");
+});
 
-    try {
-        const urlString = `Request URL: ${url} - `;
-        const timestampString = `Timestamp: ${Date().toString()}\n`;
+app.get('/', (req, res) => {
+    res.render("index");
+})
 
-        console.log("Adding request log..");
-        appendFile("requests.txt", urlString + timestampString);
-        console.log("Request Log Added!");
+app.get('/books', (req, res) => {
+    res.render("books",books=booksList);
+})
 
-        res.end("Request Log Added Succesfully!");
-    } catch (error) {
-        console.log(error);
-        res.end("Failed to add request to file!");
+app.get('/books/:id', (req, res) => {
+    const id = req.params.id;
+    const book = bookExists(id);
+    if (book?.name){
+        res.render("book",{"book":book});
+    }else{
+        res.send(`Book with id ${id} Does not Exist!`);
+
     }
+})
 
-
-});
-
-server.listen(port, hostname, () => {
-    console.log(`Server running at http://${hostname}:${port}/`);
-});
+function bookExists(id){
+    let bookObj;
+    booksList.forEach(book => {
+        if (book.id === id){
+            bookObj = book;
+            return bookObj;
+        }
+    });
+    return bookObj;
+}
