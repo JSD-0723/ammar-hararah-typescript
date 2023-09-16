@@ -26,7 +26,8 @@ app.get('/books', (req, res) => {
     res.render("books",books=booksList);
 })
 
-app.get('/books/:id', (req, res) => {
+
+app.get('/books/:id([0-9]*)', (req, res) => {
     const id = req.params.id;
     const book = bookExists(id);
     if (book?.name){
@@ -36,6 +37,16 @@ app.get('/books/:id', (req, res) => {
 
     }
 })
+
+app.get('/books/:text([%a-zA-Z]*)', (req,res) => {
+    const title = req.params.text;
+    const matchingBooks = booksList.filter((book)=>{
+        const exp = new RegExp('^'+ title + '[\w\W]*')
+        return book.name.match(exp)
+    })
+    res.send(matchingBooks)
+});
+
 
 function bookExists(id){
     let bookObj;
